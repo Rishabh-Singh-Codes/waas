@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 }
 
 async function getAccountBalance(
-  token: { name: string; mint: string; native: boolean },
+  token: { name: string; mint: string; native: boolean; decimals: number },
   address: string
 ) {
   if (token.native) {
@@ -43,9 +43,10 @@ async function getAccountBalance(
 
   try {
     const account = await getAccount(connection, ata);
-    const mint = await getMint(connection, new PublicKey(token.mint));
+    // const mint = await getMint(connection, new PublicKey(token.mint));
 
-    return Number(account.amount) / 10 ** mint.decimals;
+    // return Number(account.amount) / 10 ** mint.decimals;
+    return Number(account.amount) / 10 ** token.decimals;
   } catch (error) {
     console.log("error getAccountBalance", error);
     return 0;

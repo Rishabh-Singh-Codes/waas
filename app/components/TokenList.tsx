@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { TokenWithBalance } from "../api/hooks/useTokens";
 
 const TokenList = ({tokens}: {tokens: TokenWithBalance[]}) => {

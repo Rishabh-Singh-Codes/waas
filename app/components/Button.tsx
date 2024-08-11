@@ -13,7 +13,7 @@ export const Button = ({
     <button
       type="button"
       onClick={onClick}
-      className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 transition-all"
+      className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none  font-medium rounded-lg text-sm px-5 py-2.5 transition-all"
     >
       {children}
     </button>
@@ -31,7 +31,7 @@ export const CTAButton = ({
     <button
       type="button"
       onClick={onClick}
-      className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 flex items-center justify-between max-w-fit transition-all"
+      className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none  font-medium rounded-lg text-sm px-5 py-2.5 flex items-center justify-between max-w-fit transition-all"
     >
       {children ? (
         children
@@ -41,6 +41,28 @@ export const CTAButton = ({
           <span>Sign In with Google</span>
         </>
       )}
+    </button>
+  );
+};
+
+export const TabButton = ({
+  onClick,
+  children,
+  active,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  active: boolean;
+}) => {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-white ${
+        active ? "bg-blue-600" : "bg-blue-400"
+      } hover:bg-blue-600 focus:outline-none  font-medium rounded-lg text-sm px-5 py-2.5 flex items-center justify-between max-w-fit transition-all`}
+    >
+      {children}
     </button>
   );
 };

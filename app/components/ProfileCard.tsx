@@ -5,14 +5,26 @@ import { useRouter } from "next/navigation";
 import { BiWallet } from "react-icons/bi";
 import { MdCopyAll } from "react-icons/md";
 import { FaRegSquareCheck } from "react-icons/fa6";
-import { Button } from "./Button";
+import { Button, TabButton } from "./Button";
 import { useEffect, useState } from "react";
-import { useTokens } from "../api/hooks/useTokens";
+import { TokenWithBalance, useTokens } from "../api/hooks/useTokens";
 import TokenList from "./TokenList";
+import Swap from "./Swap";
+
+type Tab = "tokens" | "swap" | "add_funds" | "send" | "withdraw";
+const tabs: { id: Tab; name: string }[] = [
+  { id: "tokens", name: "Tokens" },
+  { id: "swap", name: "Swap" },
+  { id: "add_funds", name: "Add Funds" },
+  { id: "send", name: "Send" },
+  { id: "withdraw", name: "Withdraw" },
+];
 
 const ProfileCard = ({ publicKey }: { publicKey: string }) => {
   const session = useSession();
   const router = useRouter();
+  const [selectedTab, setSelectedTab] = useState<Tab>("tokens");
+  const { tokenBalances, loading } = useTokens(publicKey);
 
   if (session.status === "loading") {
     <div className="text-xl font-semibold text-center">Loading...</div>;
@@ -30,7 +42,27 @@ const ProfileCard = ({ publicKey }: { publicKey: string }) => {
           name={session.data?.user?.name ?? ""}
           image={session.data?.user?.image ?? ""}
         />
-        <Assets publicKey={publicKey} />
+        <div className="flex justify-between my-6 border-b border-b-slate-200 pb-3">
+          {tabs.map((tab) => (
+            <TabButton
+              key={tab.id}
+              onClick={() => setSelectedTab(tab.id)}
+              active={tab.id === selectedTab}
+            >
+              {tab.name}
+            </TabButton>
+          ))}
+        </div>
+        <div className={`${selectedTab === "tokens" ? "visible" : "hidden"}`}>
+          <Assets
+            publicKey={publicKey}
+            tokenBalances={tokenBalances}
+            loading={loading}
+          />
+        </div>
+        <div className={`${selectedTab === "swap" ? "visible" : "hidden"}`}>
+          <Swap tokenBalances={tokenBalances} />
+        </div>
       </div>
     </div>
   );
@@ -38,9 +70,19 @@ const ProfileCard = ({ publicKey }: { publicKey: string }) => {
 
 export default ProfileCard;
 
-const Assets = ({ publicKey }: { publicKey: string }) => {
+const Assets = ({
+  publicKey,
+  tokenBalances,
+  loading,
+}: {
+  publicKey: string;
+  tokenBalances: {
+    totalBalance: number;
+    tokens: TokenWithBalance[];
+  } | null;
+  loading: ConstrainBoolean;
+}) => {
   const [copied, setCopied] = useState(false);
-  const { tokenBalances, loading } = useTokens(publicKey);
 
   useEffect(() => {
     if (copied) {
@@ -62,7 +104,10 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
         <BiWallet className="text-xl mr-2" /> Account assets
       </span>
       <div className="flex justify-between items-center mb-6 mt-2">
-        <div className="text-5xl font-bold">${tokenBalances?.totalBalance?.toFixed(2)}<span className="text-slate-400 text-3xl ml-1">USD</span></div>
+        <div className="text-5xl font-bold">
+          ${tokenBalances?.totalBalance?.toFixed(2)}
+          <span className="text-slate-400 text-3xl ml-1">USD</span>
+        </div>
         <div>
           <Button
             onClick={() => {
@@ -83,7 +128,7 @@ const Assets = ({ publicKey }: { publicKey: string }) => {
           </Button>
         </div>
       </div>
-      {tokenBalances?.tokens && <TokenList tokens={tokenBalances?.tokens}/>}
+      {tokenBalances?.tokens && <TokenList tokens={tokenBalances?.tokens} />}
     </div>
   );
 };
